@@ -1751,7 +1751,7 @@ window.__require = function t(e, o, n) {
                 l.AudioPlayer.ins().init(),
                 s.default.ins().init(),
                 r.pop_mgr.get_inst().show(r.UI_CONFIG.menu),
-                console.log("onLoadq 0")
+                console.log("onLoadq 0");               
             }
             ,
             e.prototype.showTips = function(t) {
@@ -1866,7 +1866,23 @@ window.__require = function t(e, o, n) {
                 this.btn_sound.node.on("toggle", this.soundChange, this),
                 this.btn_music.node.on("toggle", this.musicChange, this),
                 console.log("onLoad 2"),
-                this.schedule(this.update1, 1)
+                this.schedule(this.update1, 1);
+
+                var recomNode = new cc.Node();
+                recomNode.y = -(this.node.height/2) + 100;
+				var lable = recomNode.addComponent(cc.Label);
+                lable.string = "更多好玩";
+                lable.fontSize = 50;
+                lable.lineHeight = 50;
+				var action = cc.sequence(cc.scaleTo(.5, 1.2), cc.scaleTo(.5, 0.9));
+				action = cc.repeatForever(action);
+                recomNode.runAction(action);
+                recomNode.on(cc.Node.EventType.TOUCH_START, function(){
+                    //埋点 推荐更多好玩
+                    console.log("more game");
+					window.h5api && window.h5api.showRecommend();
+                }, this);	
+                this.node.addChild(recomNode);	
             }
             ,
             e.prototype.update1 = function() {
@@ -2773,25 +2789,30 @@ window.__require = function t(e, o, n) {
             ,
             e.prototype.callbut = function(t, e) {
                 if(((0 == this.type) && (0 == cc.sys.localStorage.getItem("ballopen" + this.pftype))) || ((1 == this.type) && (0 == cc.sys.localStorage.getItem("fgopen" + this.pftype)))){
-                    eD.EventDispatch.ins().fire(eD.Event_Name.SHOW_TIPS, "没有获得");
                     //埋点 ！！！！！先检测是否有激励，然后播放激励，播放完回调下面！！！！！！！！！！！！！！
                     var thisObj = this;
-                    window.h5api && window.h5api.canPlayAd(function(data){
-                        if(data.canPlayAd){
-                            if(window.h5api && confirm("是否播放视频,获得相应奖励？")){
-                                window.h5api.playAd(function(obj){
-                                    console.log('代码:' + obj.code + ',消息:' + obj.message);
-                                    if (obj.code === 10000) {
-                                        console.log('开始播放');
-                                    } else if (obj.code === 10001) {
-                                        thisObj.clickCell(t, e);
-                                    } else {
-                                        console.log('广告异常');
-                                    }
-                                }.bind(this));
+                    if(window.h5api){
+                        window.h5api.canPlayAd(function(data){
+                            if(data.canPlayAd){
+                                if(window.h5api && confirm("是否播放视频,获得相应奖励？")){
+                                    window.h5api.playAd(function(obj){
+                                        console.log('代码:' + obj.code + ',消息:' + obj.message);
+                                        if (obj.code === 10000) {
+                                            console.log('开始播放');
+                                        } else if (obj.code === 10001) {
+                                            thisObj.clickCell(t, e);
+                                        } else {
+                                            console.log('广告异常');
+                                        }
+                                    }.bind(this));
+                                }
+                            }else{
+                                eD.EventDispatch.ins().fire(eD.Event_Name.SHOW_TIPS, "没有获得");
                             }
-                        }
-                    }.bind(this));
+                        }.bind(this));
+                    }else{
+                        eD.EventDispatch.ins().fire(eD.Event_Name.SHOW_TIPS, "没有获得");
+                    }
                 }else{
                     this.clickCell(t, e);
                 }
