@@ -1201,6 +1201,12 @@ window.__require = function t(e, o, n) {
             e.prototype.updateScore = function(t, e) {
                 var o = s.default.ins().score;
                 this.lb_score.string = "" + o
+
+                //埋点 上报分数
+              //  console.log("score:" + o);
+                if (window.h5api && window.h5api.isLogin() && o) {
+                    window.h5api.submitRanking(o, function (data) { });
+                }
             }
             ,
             e.prototype.updateBallPower = function(t, e) {
@@ -1877,7 +1883,14 @@ window.__require = function t(e, o, n) {
                 // c.pop_mgr.get_inst().show(c.UI_CONFIG.rank),
                 // s.AudioPlayer.ins().play_sound(s.AUDIO_CONFIG.Audio_Btn)
                 //埋点 排行榜
-                console.log("ranking");
+             //   console.log("ranking");
+                if(window.h5api){
+					if (window.h5api.isLogin()) {
+                     window.h5api.showRanking();
+					} else if (confirm("登录后才能看到好友哦~")) {
+						window.h5api.login(function (obj) { });
+					}
+				}
             }
             ,
             e.prototype.shengji = function() {
@@ -1906,7 +1919,8 @@ window.__require = function t(e, o, n) {
             ,
             e.prototype.share = function() {
                 //埋点 分享
-                console.log("share");
+                //console.log("share");
+                window.h5api && window.h5api.share();
                // a.EventDispatch.ins().fire(a.Event_Name.SHOW_TIPS, "分享失败")
             }
             ,
@@ -2123,7 +2137,8 @@ window.__require = function t(e, o, n) {
             e.prototype.share = function() {
                // l.EventDispatch.ins().fire(l.Event_Name.SHOW_TIPS, "\u5206\u4eab\u5931\u8d25")
                //埋点 分享
-               console.log("share");
+              // console.log("share");
+              window.h5api && window.h5api.share();
             }
             ,
             e.prototype.closeGameRevive = function() {
@@ -2137,12 +2152,22 @@ window.__require = function t(e, o, n) {
             ,
             e.prototype.updateCanRevive = function(t) {
                 //埋点 没有激励 t = 0, 有激励不修改t
-                
-                this.node_revive.active = t,
-                this.node_no_revive.active = !t,
-                t ? (this._autoReviveCount = 10,
-                this.autoReviveCountFn(),
-                this.schedule(this.autoReviveCountFn, 1, this._autoReviveCount + 1, 0)) : this.unschedule(this.autoReviveCountFn)
+                window.h5api && window.h5api.canPlayAd(function(data){
+					if(data.canPlayAd){
+                        this.node_revive.active = t,
+                        this.node_no_revive.active = !t,
+                        t ? (this._autoReviveCount = 10,
+                        this.autoReviveCountFn(),
+                        this.schedule(this.autoReviveCountFn, 1, this._autoReviveCount + 1, 0)) : this.unschedule(this.autoReviveCountFn)
+                    }else{
+                        t = 0;
+                        this.node_revive.active = t,
+                        this.node_no_revive.active = !t,
+                        t ? (this._autoReviveCount = 10,
+                        this.autoReviveCountFn(),
+                        this.schedule(this.autoReviveCountFn, 1, this._autoReviveCount + 1, 0)) : this.unschedule(this.autoReviveCountFn)
+                    }
+				}.bind(this));
             }
             ,
             e.prototype.autoReviveCountFn = function() {
@@ -2750,7 +2775,23 @@ window.__require = function t(e, o, n) {
                 if(((0 == this.type) && (0 == cc.sys.localStorage.getItem("ballopen" + this.pftype))) || ((1 == this.type) && (0 == cc.sys.localStorage.getItem("fgopen" + this.pftype)))){
                     eD.EventDispatch.ins().fire(eD.Event_Name.SHOW_TIPS, "没有获得");
                     //埋点 ！！！！！先检测是否有激励，然后播放激励，播放完回调下面！！！！！！！！！！！！！！
-                    this.clickCell(t, e);
+                    var thisObj = this;
+                    window.h5api && window.h5api.canPlayAd(function(data){
+                        if(data.canPlayAd){
+                            if(window.h5api && confirm("是否播放视频,获得相应奖励？")){
+                                window.h5api.playAd(function(obj){
+                                    console.log('代码:' + obj.code + ',消息:' + obj.message);
+                                    if (obj.code === 10000) {
+                                        console.log('开始播放');
+                                    } else if (obj.code === 10001) {
+                                        thisObj.clickCell(t, e);
+                                    } else {
+                                        console.log('广告异常');
+                                    }
+                                }.bind(this));
+                            }
+                        }
+                    }.bind(this));
                 }else{
                     this.clickCell(t, e);
                 }
@@ -3896,10 +3937,10 @@ window.__require = function t(e, o, n) {
 
                 //埋点 激励用完隐藏 定时
                 this.TimerCheckAd = setInterval(function(){
-                    // videoBtn.active = 0;
+                    window.h5api && window.h5api.canPlayAd(function(data){
+                        videoBtn.active = data.canPlayAd;
+                    }.bind(this));
                 }, 500);
-               
-              //  console.log(this.node);
             },
             e.prototype.start = function() {
                 this.updateval(),
