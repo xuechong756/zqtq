@@ -2767,7 +2767,9 @@ window.__require = function t(e, o, n) {
                 e
             }
             return n(e, t),
-            e.prototype.start = function() {}
+            e.prototype.start = function() {
+				
+			}
             ,
             e.prototype.gettheam = function(t) {
                 var e = [[89, 211, 229, 255], [225, 225, 225, 255], [242, 244, 55, 255], [245, 129, 241, 255], [232, 152, 38, 255], [68, 206, 235, 255], [225, 225, 225, 255], [231, 220, 43, 255], [66, 243, 195, 255], [243, 224, 66, 255], [241, 116, 193, 255], [66, 216, 229, 255]]
@@ -2777,10 +2779,8 @@ window.__require = function t(e, o, n) {
                 o
             }
             ,
-            e.prototype.onLoad = function(){
-                // var kuang = cc.find("suo", this.node);
-                // kuang.active = 0;
-                console.log(this.node);
+            e.prototype.start = function(){
+                
             },
             e.prototype.init = function(t) {
                 if (this.pftype = t,
@@ -2795,7 +2795,15 @@ window.__require = function t(e, o, n) {
             ,
             e.prototype.updatestate = function(t, e) {
                 this.suonode.active = !t,
-                this.xuanznode.active = e
+                this.xuanznode.active = e;
+				
+				 var suo = cc.find("suo", this.node);
+				 //埋点 激励用完需要隐藏
+				 window.h5api && window.h5api.canPlayAd(function(data){
+					 if(suo.children[0].active){
+						suo.children[0].active = data.canPlayAd;
+					 }
+				 }.bind(this));
             }
             ,
             e.prototype.callbut = function(t, e) {
