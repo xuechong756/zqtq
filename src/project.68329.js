@@ -2162,8 +2162,19 @@ window.__require = function t(e, o, n) {
             }
             ,
             e.prototype.gameRevive = function() {
-                l.EventDispatch.ins().fire(l.Event_Name.GAME_RELIVE),
-                this.onCloseBtnTouch()
+                //埋点 激励回调下面
+                if(window.h5api && confirm("是否播放视频,获得相应奖励？")){
+					window.h5api.playAd(function(obj){
+						console.log('代码:' + obj.code + ',消息:' + obj.message);
+						if (obj.code === 10000) {
+						} else if (obj.code === 10001) {
+                            l.EventDispatch.ins().fire(l.Event_Name.GAME_RELIVE),
+                            this.onCloseBtnTouch()
+						} else {
+							console.log('广告异常');
+						}
+					}.bind(this));
+				}
             }
             ,
             e.prototype.updateCanRevive = function(t) {
