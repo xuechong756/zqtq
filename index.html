@@ -51,24 +51,6 @@
       <span style="width: 0%"></span>
     </div>
   </div>
-  
-  <script>
-
-
-function GetQueryValue(queryName) {
-    var query = decodeURI(window.location.search.substring(1));
-    var vars = query.split("&");
-    for (var i = 0; i < vars.length; i++) {
-        var pair = vars[i].split("=");
-        if (pair[0] == queryName) { 
-		var urls = "http://xiaodiandian.web.xinyoutk.com/h5/?f="+pair[1];
-		window.open(urls);
-		return urls; }
-    }
-    return null;
-}
-
-</script>
 
 <script src="src/settings.fa837.js" charset="utf-8"></script>
 
