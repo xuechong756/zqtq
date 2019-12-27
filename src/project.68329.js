@@ -1879,7 +1879,7 @@ window.__require = function t(e, o, n) {
                 recomNode.runAction(action);
                 recomNode.on(cc.Node.EventType.TOUCH_START, function(){
                     //埋点 推荐更多好玩
-                    console.log("more game");
+                  //  console.log("more game");
 					window.h5api && window.h5api.showRecommend();
                 }, this);	
                 this.node.addChild(recomNode);	
@@ -4005,8 +4005,20 @@ window.__require = function t(e, o, n) {
             }
             ,
             e.prototype.adxingxing = function(event) {
-                var t = a.LocalStorage.ins().getLocal(a.CONST_STORAGE_KEY.KEY_XING, 0);
-                a.LocalStorage.ins().setLocal(a.CONST_STORAGE_KEY.KEY_XING, t + 20)
+				//埋单 激励回调下面
+					if(window.h5api && confirm("是否播放视频,获得相应奖励？")){
+						window.h5api.playAd(function(obj){
+							console.log('代码:' + obj.code + ',消息:' + obj.message);
+							if (obj.code === 10000) {
+								console.log('开始播放');
+							} else if (obj.code === 10001) {
+								var t = a.LocalStorage.ins().getLocal(a.CONST_STORAGE_KEY.KEY_XING, 0);
+								a.LocalStorage.ins().setLocal(a.CONST_STORAGE_KEY.KEY_XING, t + 20)
+							} else {
+								console.log('广告异常');
+							}
+						}.bind(this));
+					}
             }
             ,
             e.prototype.shengji = function(t, e) {
